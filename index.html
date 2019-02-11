@@ -7,10 +7,36 @@
 </head>
 
 <body>
-    <h1>Algoritmos de Planificacion - SRTF</h1>
-    <canvas id="myCanvas"></canvas>
-    <legend for="myCanvas"></legend>
-    <script type="text/javascript" src="js/script.js"></script>
+    <div>
+        <h1>Algoritmos de Planificacion - SRTF</h1>
+    </div>
+    <div>
+        <form action="">
+            <button onclick="">Generar</button>
+            <label for="txtTiempoInicio">Identificador</label>
+            <input class="text" name="txtId" type="text" value="id"/>
+            <label for="txtTiempoInicio">Nombre</label>
+            <input class="text" name="txtNombre" type="text" value="name"/>
+            <label for="txtTiempoInicio">Tiempo Inicio</label>
+            <input class="text" name="txtTiempoInicio" type="text" value="time"/>
+            <label for="txtTiempoInicio">Rafaga</label>
+            <input class="text" name="txtRafaga" type="text" value="rafaga"/>
+            <button onclick="">Agregar</button>
+        </form>
+    </div>
+    <div>
+        <h4>Cantidad de Procesos</h4>
+        <h5 id="cantidadProcesos">0</h5>
+    </div>
+    <div>
+        <h4>Tiempo de Ejecucion</h4>
+        <h5 id="tiempoEjecucion">0</h5>
+        <canvas id="myCanvas"></canvas>
+        <legend for="myCanvas"></legend>
+        <button onclick="clearInterval(myVar)">Parar Ejecucion</button>
+    </div>
+    <script type="text/javascript" src="js/formulario.js"></script>
+    <script type="text/javascript" src="js/grafico.js"></script>
 </body>
 
 </html>
