@@ -2,8 +2,6 @@ var tam_base = 300;
 var inicio_nombres = 10;
 var inicio_barras = 70;
 
-var tiempoGlobalEjecucion = 0;
-
 var myCanvas = document.getElementById("myCanvas");
 myCanvas.width = tam_base;
 myCanvas.height = tam_base;
@@ -17,9 +15,6 @@ function tiempo() {
 
 function dibujarBase(ctx) {
     ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
-    console.log(tiempoGlobalEjecucion);
-    tiempoGlobalEjecucion += 1;
-    document.getElementById("tiempoEjecucion").innerHTML = tiempoGlobalEjecucion;
 }
 
 function dibujarLinea(ctx, startX, startY, endX, endY, color){
