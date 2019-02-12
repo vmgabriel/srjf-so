@@ -5,6 +5,12 @@ var proceso; // Hilo base
 
 var tiempoGlobalEjecucion = 0; //Tiempo de ejecucion de proceso
 
+//Colores Procesos
+var colorVerde1 = "#088A08";
+var colorVerde2 = "#58FA58";
+var colorAmarillo1 = "#AEB404";
+var colorAmarillo2 = "#F4FA58";
+
 // Variables de grafica por defecto
 var inicioNombres = 10;
 var inicioBarras = 80;
@@ -93,9 +99,15 @@ function arrancarEjecucion() {
     lineasTiempo(ctx);
 
     var temp = 0;
+    var tempColor = "";
     while (temp < procesos) {
         dibujarTexto(ctx, "Base"+temp,  inicioNombres, margenProceso+((temp+1)*distanciaEntreProcesos), "#08298A");
-        dibujarBarra(ctx, inicioBarras, (margenProceso + 10)+(temp*distanciaEntreProcesos), 40, anchoBarra, '#DF0101');
+        if (temp%2 == 1) {
+            tempColor = colorVerde2;
+        } else {
+            tempColor = colorVerde1;
+        }
+        dibujarBarra(ctx, inicioBarras, (margenProceso + 10)+(temp*distanciaEntreProcesos), distanciaEntreBarras, anchoBarra, tempColor);
         temp += 1;
     }
     tiempoGlobalEjecucion += 1;
