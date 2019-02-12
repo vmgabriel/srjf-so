@@ -41,3 +41,7 @@ function generar() {
     document.getElementById("txtTiempo").value = tiempo;
     document.getElementById("txtRafaga").value = rafaga;
 }
+
+function agregar() {
+    
+}

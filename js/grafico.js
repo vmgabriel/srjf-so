@@ -77,12 +77,12 @@ function lineasTiempo(ctx) {
     var grosorBarra = 2;
     var colorBarra = "#08088A";
     var inicioPintadoBarra = 30;
-    var largoBarras = 2000;
+    var largoBarras = myCanvas.height;
 
     var posicionTexto = 20;
 
     if (procesos > 11 && dispatch == false) {
-        myCanvas.height += (distanciaTiempoTexto*(procesos-11));
+        myCanvas.height = 60+(procesos*20);
         dispatch = true;
     }
 
