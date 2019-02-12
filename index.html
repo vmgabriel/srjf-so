@@ -30,10 +30,13 @@
     </div>
     <div>
         <h4>Tiempo de Ejecucion</h4>
-        <h5 id="tiempoEjecucion">0</h5>
+        <h5 id="timeExec">0</h5>
         <canvas id="myCanvas"></canvas>
         <legend for="myCanvas"></legend>
-        <button onclick="clearInterval(myVar)">Parar Ejecucion</button>
+        <div>
+            <button onclick="pausar()" id="inicioTiempo">Iniciar Ejecucion</button>
+            <button onclick="clearInterval(myVar)">Parar Ejecucion</button>
+        </div>
     </div>
     <script type="text/javascript" src="js/formulario.js"></script>
     <script type="text/javascript" src="js/grafico.js"></script>
