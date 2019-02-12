@@ -1,4 +1,3 @@
-var procesos = 13; //Cantidad de Procesos en el sistema
 var onOff = true; // Ejecucion de Pausa/play
 var dispatch = false; // Evalua si algo cambio en la lista de procesos
 var proceso; // Hilo base
@@ -24,6 +23,8 @@ var myCanvas = document.getElementById("myCanvas");
 var myTimeExec = document.getElementById("timeExec");
 var myInitTime = document.getElementById("inicioTiempo");
 var myCantProcess = document.getElementById("cantidadProcesos");
+
+var procesos = parseInt(myCantProcess.innerHTML); //Cantidad de Procesos en el sistema
 
 myCanvas.width = 120;
 myCanvas.height = 300;
