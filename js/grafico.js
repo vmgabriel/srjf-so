@@ -26,9 +26,11 @@ var myCantProcess = document.getElementById("cantidadProcesos");
 
 var procesos = parseInt(myCantProcess.innerHTML); //Cantidad de Procesos en el sistema
 
+// Tamaño base del Canvas
 myCanvas.width = 120;
 myCanvas.height = 300;
 
+// Configuracion Base
 var ctx = myCanvas.getContext("2d");
 
 // Metodos Base
@@ -44,7 +46,8 @@ function dibujarBase(ctx) {
     ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
 }
 
-function dibujarLinea(ctx, startX, startY, endX, endY, color){
+function dibujarLinea(ctx, startX, startY, endX, endY, color) {
+    // La buena Herencia
     ctx.save();
     ctx.strokeStyle = color;
     ctx.beginPath();
