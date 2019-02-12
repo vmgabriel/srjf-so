@@ -9,5 +9,4 @@ var randomLetter = function() {
 function generar() {
     var id = parseInt(document.getElementById("cantidadProcesos"))+1;
     var nombre = randomLetter.get();
-    
 }
