@@ -26,7 +26,6 @@ var randomNumber = function() {
 
 function generar() {
     var tiempoEjecucion = parseInt(document.getElementById("timeExec").innerHTML);
-    console.log(tiempoEjecucion);
 
     var rl = new randomLetter();
     var rn = new randomNumber();
@@ -40,8 +39,4 @@ function generar() {
     document.getElementById("txtNombre").value = nombre;
     document.getElementById("txtTiempo").value = tiempo;
     document.getElementById("txtRafaga").value = rafaga;
-}
-
-function agregar() {
-    
 }

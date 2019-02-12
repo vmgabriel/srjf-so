@@ -94,9 +94,19 @@ function lineasTiempo(ctx) {
     }
 }
 
+function agregarTextos(ctx) {
+    var temp = 0;
+    var color = "#08298A";
+    while (temp < procesos) {
+        dibujarTexto(ctx, todasListas.listaProcesos[temp].nombre,  inicioNombres, margenProceso+((temp+1)*distanciaEntreProcesos), color);
+        temp++;
+    }
+}
+
 // Manejo de Proceso Principal
 
 function arrancarEjecucion() {
+    procesos = parseInt(myCantProcess.innerHTML); //Cantidad de Procesos en el sistema
     myTimeExec.innerHTML = tiempoGlobalEjecucion;
     myCanvas.width += distanciaEntreBarras;
 
@@ -105,7 +115,7 @@ function arrancarEjecucion() {
     var temp = 0;
     var tempColor = "";
     while (temp < procesos) {
-        dibujarTexto(ctx, "Base"+temp,  inicioNombres, margenProceso+((temp+1)*distanciaEntreProcesos), "#08298A");
+        
         if (temp%2 == 1) {
             tempColor = colorVerde2;
         } else {
@@ -132,6 +142,9 @@ function pausar() {
 }
 
 function detener() {
+    // Tamaño base del Canvas
+    myCanvas.width = 120;
+    myCanvas.height = 300;
     onOff = true;
     clearInterval(proceso);
     tiempoGlobalEjecucion = 0;

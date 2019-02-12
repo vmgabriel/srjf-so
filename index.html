@@ -12,31 +12,25 @@
     </div>
     <button onclick="generar()">Generar</button>
     <div>
-        <form action="">
-            <label for="txtTiempoInicio">Identificador</label>
-            <input id="txtId" class="text" name="txtId" type="text" value="" placeholder="Id"/>
-            <label for="txtTiempoInicio">Nombre</label>
-            <input id="txtNombre" class="text" name="txtNombre" type="text" value="" placeholder="Nombre"/>
-            <label for="txtTiempoInicio">Tiempo Inicio</label>
-            <input id="txtTiempo" class="text" name="txtTiempoInicio" type="text" value="" placeholder="Tiempo"/>
-            <label for="txtTiempoInicio">Rafaga</label>
-            <input id="txtRafaga" class="text" name="txtRafaga" type="text" value="" placeholder="Rafaga"/>
-            <button onclick="">Agregar</button>
-        </form>
+        <label for="txtTiempoInicio">Identificador</label>
+        <input id="txtId" class="text" name="txtId" type="text" value="" placeholder="Id" required/>
+        <label for="txtTiempoInicio">Nombre</label>
+        <input id="txtNombre" class="text" name="txtNombre" type="text" value="" placeholder="Nombre" required />
+        <label for="txtTiempoInicio">Tiempo Inicio</label>
+        <input id="txtTiempo" class="text" name="txtTiempoInicio" type="text" value="" placeholder="Tiempo" required />
+        <label for="txtTiempoInicio">Rafaga</label>
+        <input id="txtRafaga" class="text" name="txtRafaga" type="text" value="" placeholder="Rafaga" required />
+        <button onclick="agregar()">Agregar</button>
     </div>
     <div>
         <h4>Cantidad de Procesos</h4>
-        <h5 id="cantidadProcesos">12</h5>
-        <table class="processList">
+        <h5 id="cantidadProcesos">0</h5>
+        <table id="processList" class="processList">
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Tiempo Inicio</th>
                 <th>Rafaga</th>
-                <th>Tiempo Comienzo</th>
-                <th>Tiempo Final</th>
-                <th>Tiempo Retorno</th>
-                <th>Tiempo Espera</th>
             </tr>
         </table>
     </div>
@@ -51,6 +45,7 @@
         </div>
     </div>
     <script type="text/javascript" src="js/formulario.js"></script>
+    <script type="text/javascript" src="js/tablas.js"></script>
     <script type="text/javascript" src="js/grafico.js"></script>
 </body>
 
