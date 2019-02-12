@@ -6,7 +6,38 @@ var randomLetter = function() {
     };
 }
 
+var randomNumber = function() {
+    this.intervaloRafaga = 10;
+    this.intervaloMaxTiempo = 8;
+    this.intervaloIdentificador = 9999;
+
+    this.rafaga = function() {
+        return Math.floor(1+(Math.random()*this.intervaloRafaga));
+    };
+
+    this.identificador = function() {
+        return Math.floor(Math.random()*this.intervaloIdentificador);
+    };
+
+    this.tiempoInicio = function(base) {
+        return Math.floor(base+(Math.random()*this.intervaloMaxTiempo));
+    };
+}
+
 function generar() {
-    var id = parseInt(document.getElementById("cantidadProcesos"))+1;
-    var nombre = randomLetter.get();
+    var tiempoEjecucion = parseInt(document.getElementById("timeExec").innerHTML);
+    console.log(tiempoEjecucion);
+
+    var rl = new randomLetter();
+    var rn = new randomNumber();
+
+    var nombre = rl.get();
+    var id = rn.identificador();
+    var rafaga = rn.rafaga();
+    var tiempo = rn.tiempoInicio(tiempoEjecucion);
+
+    document.getElementById("txtId").value = id;
+    document.getElementById("txtNombre").value = nombre;
+    document.getElementById("txtTiempo").value = tiempo;
+    document.getElementById("txtRafaga").value = rafaga;
 }
