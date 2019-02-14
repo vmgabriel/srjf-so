@@ -44,7 +44,7 @@ var listas = function() {
 
     this.addListaProcesos = function(dato) {
         var valor = false;
-        if (this.compararIdProceso(dato.id) == false && tiempoGlobalEjecucion <= dato.tiempoInicio) {
+        if (this.compararIdProceso(dato.id) == false && tiempoGlobalEjecucion < dato.tiempoInicio) {
             this.listaProcesos.push(dato);
             valor = true;
         }
@@ -203,7 +203,7 @@ function generar() {
     var nombre = rl.get();
     var id = rn.identificador();
     var rafaga = rn.rafaga();
-    var tiempo = rn.tiempoInicio(tiempoEjecucion);
+    var tiempo = rn.tiempoInicio(tiempoEjecucion+1);
 
     document.getElementById("txtId").value = id;
     document.getElementById("txtNombre").value = nombre;
@@ -234,7 +234,7 @@ function dibujarLinea(ctx, startX, startY, endX, endY, color) {
 }
 
 function dibujarBarra(ctx, upperLeftCornerX, upperLeftCornerY, width, height, color){
-    ctx.save();
+    //ctx.save();
     ctx.fillStyle=color;
     ctx.fillRect(upperLeftCornerX,upperLeftCornerY,width,height);
     //ctx.restore();
@@ -279,17 +279,21 @@ function agregarTextos(ctx) {
     }
 }
 
+function printProceso(ctx, x, y, estado) {
+    var tempColor = "";
+    if (y%2 == 1) {
+        tempColor = colorVerde2;
+    } else {
+        tempColor = colorVerde1;
+    }
+    dibujarBarra(ctx, inicioBarras, (margenProceso + 10)+(y*distanciaEntreProcesos), (x*distanciaEntreBarras), anchoBarra, tempColor);
+}
+
 function pintarProcesos(ctx) {
     var temp = 0;
-    var tempColor = "";
 
     while (temp < procesos) {
-        if (temp%2 == 1) {
-            tempColor = colorVerde2;
-        } else {
-            tempColor = colorVerde1;
-        }
-        dibujarBarra(ctx, inicioBarras, (margenProceso + 10)+(temp*distanciaEntreProcesos), distanciaEntreBarras, anchoBarra, tempColor);
+        printProceso(ctx,tiempoGlobalEjecucion,temp,"est");
         temp++;
     }
 }
@@ -347,4 +351,5 @@ function detener() {
     myInitTime.innerHTML = "Iniciar Ejecucion";
     myTimeExec.innerHTML = 0;
     dibujarBase(ctx);
+    todasListas.listaLlegada = [];
 }
