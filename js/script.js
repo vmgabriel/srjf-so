@@ -1,8 +1,11 @@
 var onOff = true; // Ejecucion de Pausa/play
 var dispatch = false; // Evalua si algo cambio en la lista de procesos
+var dispatchEstado = true; // Evalua si algo cambio en la lista de en Espera
 var proceso; // Hilo base
 
-var procesoEnEjecucion; //Proceso que se esta ejecutando
+var arregloPintarProcesos = new Array(); //Hilo de Impresion Para Procesos
+
+var procesoEnEjecucion = null; //Proceso que se esta ejecutando
 
 var tiempoGlobalEjecucion = 0; //Tiempo de ejecucion de proceso
 
@@ -72,6 +75,68 @@ var listas = function() {
     this.cantListaProcesos = function() {
         return this.listaProcesos.length;
     };
+
+    this.cantListaProcesosEspera = function() {
+        return this.listaLlegados.length;
+    };
+
+    this.minProcesoRafaga = function() {
+        var proceso = 0;
+        var rafagaMin = 1000;
+        this.listaLlegados.forEach(function (elem, index) {
+            if(elem.rafaga < rafagaMin) {
+                rafagaMin = elem.rafaga;
+                proceso = index;
+            }
+        });
+        return this.listaLlegados.splice(proceso, 1)[0];
+    };
+
+    this.compararProcesosRafaga = function(ejecucion) {
+        var isMin = false;
+        this.listaLlegados.forEach(function (elem, index) {
+            if(elem.rafaga < ejecucion.rafaga) {
+                isMin = true;
+            }
+        });
+        return isMin;
+    };
+
+    this.indexProceso = function(proceso) {
+        var index = 0;
+        this.listaProcesos.forEach(function(elem, ind) {
+            if (elem.id == proceso.id) {
+                index = ind;
+            }
+        });
+        return index;
+    };
+
+    this.dotarBase = function() {
+        this.listaProcesos.forEach(function(elem, ind) {
+            elem.procesoBase = ind;
+        });
+    };
+
+    this.rafagaProceso = function(proceso) {
+        var rafaga = 0;
+        console.log(this.listaProcesos);
+        this.listaProcesos.forEach(function(elem) {
+            console.log(`${elem.id} en esquema ${proceso.id}`);
+            if (elem.id == proceso.id) {
+                rafaga = elem.rafaga;
+            }
+        });
+        return rafaga;
+    };
+
+    this.modificarRafaga = function(proceso, rafaga) {
+        this.listaProcesos.forEach(function(elem) {
+            if (elem.id == proceso.id) {
+                elem.rafaga = rafaga;
+            }
+        });
+    };
 }
 
 var todasListas = new listas();
@@ -85,6 +150,8 @@ var Proceso = function(_id, _nombre, _tiempo, _rafaga) {
     this.tiempoFinal = 0;
     this.tiempoRetorno = 0;
     this.tiempoEspera = 0;
+    this.salidaDispatch = 0;
+    this.procesoBase = 0;
 
     this.putTableLong = function() {
 
@@ -184,6 +251,12 @@ function addToTableShort(_tabla, valor) {
     }
 }
 
+function addToTableLong(_tabla, valor) {
+    var tabla = document.getElementById(_tabla);
+    tabla.innerHTML += valor.putTableLong();
+    document.getElementById("cantidadProcesosFin").innerHTML = parseInt(document.getElementById("cantidadProcesosFin").innerHTML)+1;
+}
+
 function agregar() {
     var id = document.getElementById("txtId").value;
     var nombre = document.getElementById("txtNombre").value;
@@ -191,6 +264,7 @@ function agregar() {
     var rafaga = document.getElementById("txtRafaga").value;
 
     var nProceso = new Proceso(id,nombre,tiempo,rafaga);
+    todasListas.dotarBase();
     addToTableShort("processList", nProceso);
 }
 
@@ -209,6 +283,27 @@ function generar() {
     document.getElementById("txtNombre").value = nombre;
     document.getElementById("txtTiempo").value = tiempo;
     document.getElementById("txtRafaga").value = rafaga;
+}
+
+function modificarProcesoEjecucion() {
+    var nombre = procesoEnEjecucion.nombre + procesoEnEjecucion.salidaDispatch;
+    var id = procesoEnEjecucion.id;
+    var rafaga = procesoEnEjecucion.rafaga;
+    var tiempo = procesoEnEjecucion.tiempo;
+
+    todasListas.modificarRafaga(procesoEnEjecucion, rafaga);
+
+    var nProceso = new Proceso(id,nombre,tiempo,rafaga);
+    nProceso.salidaDispatch = procesoEnEjecucion.salidaDispatch + 1;
+    nProceso.tiempoInicio = procesoEnEjecucion.tiempoInicio;
+
+    procesoEnEjecucion.tiempoFinal = tiempoGlobalEjecucion;
+    nProceso.procesoBase = procesoEnEjecucion.procesoBase;
+
+    todasListas.addListaLlegados(nProceso);
+
+    procesoEnEjecucion.rafaga = todasListas.rafagaProceso(procesoEnEjecucion);
+    addToTableLong("processListEnd", procesoEnEjecucion);
 }
 
 function tiempo() {
@@ -279,6 +374,17 @@ function agregarTextos(ctx) {
     }
 }
 
+function imprimirProcesoEjecucion() {
+    if (tiempoGlobalEjecucion > 0 && procesoEnEjecucion != null) {
+        document.getElementById("idProcesoEjecucion").innerHTML = procesoEnEjecucion.id;
+        document.getElementById("nombreProcesoEjecucion").innerHTML = procesoEnEjecucion.nombre;
+        document.getElementById("rafagaProcesoEjecucion").innerHTML = procesoEnEjecucion.rafaga;
+        document.getElementById("tComienzoProcesoEjecucion").innerHTML = procesoEnEjecucion.tiempoComienzo;
+        document.getElementById("tRetornoProcesoEjecucion").innerHTML = procesoEnEjecucion.tiempoRetorno;
+        document.getElementById("tEsperaProcesoEjecucion").innerHTML = procesoEnEjecucion.tiempoEspera;
+    }
+}
+
 function printProceso(ctx, x, y, estado) {
     var tempColor = "";
     if (y%2 == 1) {
@@ -287,6 +393,16 @@ function printProceso(ctx, x, y, estado) {
         tempColor = colorVerde1;
     }
     dibujarBarra(ctx, inicioBarras, (margenProceso + 10)+(y*distanciaEntreProcesos), (x*distanciaEntreBarras), anchoBarra, tempColor);
+}
+
+var Posicion = function(_x, _y, _estado) {
+    this.x = _x;
+    this.y = _y;
+    this.estado = _estado;
+
+    this.dibujarPosicion(ctx) = function() {
+        printProceso(ctx, this.x, this.y, this.estado);
+    };
 }
 
 function pintarProcesos(ctx) {
@@ -298,13 +414,55 @@ function pintarProcesos(ctx) {
     }
 }
 
+function incrementarWait() {
+    todasListas.listaLlegados.forEach(function(elem) {
+        elem.tiempoRetorno += 1;
+        elem.tiempoEspera += 1;
+    });
+}
+
+function aumentarProcesoEjecucion() {
+    procesoEnEjecucion.tiempoFinal += 1;
+    procesoEnEjecucion.tiempoRetorno += 1;
+    procesoEnEjecucion.rafaga -= 1;
+}
+
+function prepararCiclo() {
+    if (todasListas.cantListaProcesosEspera() > 0) {
+        if (dispatchEstado == true) {
+            if (procesoEnEjecucion == null) {
+                procesoEnEjecucion = todasListas.minProcesoRafaga();
+                procesoEnEjecucion.tiempoComienzo = tiempoGlobalEjecucion;
+            } else {
+                if (todasListas.compararProcesosRafaga(procesoEnEjecucion)) {
+                    modificarProcesoEjecucion();
+                    procesoEnEjecucion = todasListas.minProcesoRafaga();
+                    procesoEnEjecucion.tiempoComienzo = tiempoGlobalEjecucion;
+                }
+            }
+            dispatchEstado = false;
+        }
+        if (procesoEnEjecucion.rafaga == 0) {
+            procesoEnEjecucion.rafaga = todasListas.rafagaProceso(procesoEnEjecucion);
+            console.log(todasListas.rafagaProceso(procesoEnEjecucion));
+            procesoEnEjecucion.tiempoFinal = tiempoGlobalEjecucion;
+            addToTableLong("processListEnd", procesoEnEjecucion);
+
+            procesoEnEjecucion = todasListas.minProcesoRafaga();
+            procesoEnEjecucion.tiempoComienzo = tiempoGlobalEjecucion;
+        }
+        aumentarProcesoEjecucion();
+        incrementarWait();
+    }
+}
+
 
 function ejecucionProcesos() {
-    todasListas.listaProcesos.forEach(function(elem, index, array) {
+    todasListas.listaProcesos.forEach(function(elem) {
         if (elem.tiempoInicio == tiempoGlobalEjecucion) {
-            //todasListas.listaProcesos.splice(index, 1);
             todasListas.addListaLlegados(elem);
             myCantProcessEspera.innerHTML = parseInt(myCantProcessEspera.innerHTML)+1;
+            dispatchEstado = true;
         }
     });
 }
@@ -316,9 +474,12 @@ function arrancarEjecucion() {
     myTimeExec.innerHTML = tiempoGlobalEjecucion;
     myCanvas.width += distanciaEntreBarras;
 
-    ejecucionProcesos();
-    pintarTablaEspera();
+    ejecucionProcesos(); //Pasa de una Cola a otra
+    prepararCiclo(); //App en si
+    imprimirProcesoEjecucion(); //Imprime el Proceso Actual
+    pintarTablaEspera(); // Imprime la tabla en Espera
 
+    // Parte Grafica
     lineasTiempo(ctx);
     agregarTextos(ctx);
     if (tiempoGlobalEjecucion > 0) {
@@ -352,4 +513,14 @@ function detener() {
     myTimeExec.innerHTML = 0;
     dibujarBase(ctx);
     todasListas.listaLlegada = [];
+
+    document.getElementById("idProcesoEjecucion").innerHTML = 0;
+    document.getElementById("nombreProcesoEjecucion").innerHTML = "";
+    document.getElementById("rafagaProcesoEjecucion").innerHTML = 0;
+    document.getElementById("tComienzoProcesoEjecucion").innerHTML = 0;
+    document.getElementById("tRetornoProcesoEjecucion").innerHTML = 0;
+    document.getElementById("tEsperaProcesoEjecucion").innerHTML = 0;
+
+    procesoEnEjecucion = null;
+    arregloPintarProcesos = new Array();
 }
