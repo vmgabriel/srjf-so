@@ -9,6 +9,8 @@ var procesoEnEjecucion = null; //Proceso que se esta ejecutando
 
 var tiempoGlobalEjecucion = 0; //Tiempo de ejecucion de proceso
 
+var procesoEspacioBase = 0;
+
 //Colores Procesos
 var colorVerde1 = "#088A08";
 var colorVerde2 = "#58FA58";
@@ -85,7 +87,6 @@ var listas = function() {
         var rafagaMin = 1000;
         this.listaLlegados.forEach(function (elem, index) {
             if(elem.rafaga < rafagaMin) {
-                console.log(`Seleccione ${elem.nombre}`);
                 rafagaMin = elem.rafaga;
                 proceso = index;
             }
@@ -95,7 +96,7 @@ var listas = function() {
 
     this.compararProcesosRafaga = function(ejecucion) {
         var isMin = false;
-        this.listaLlegados.forEach(function (elem, index) {
+        this.listaLlegados.forEach(function (elem) {
             if(elem.rafaga < ejecucion.rafaga) {
                 isMin = true;
             }
@@ -260,11 +261,12 @@ function addToTableLong(_tabla, valor) {
 function agregar() {
     var id = document.getElementById("txtId").value;
     var nombre = document.getElementById("txtNombre").value;
-    var tiempo = document.getElementById("txtTiempo").value;
-    var rafaga = document.getElementById("txtRafaga").value;
+    var tiempo = parseInt(document.getElementById("txtTiempo").value);
+    var rafaga = parseInt(document.getElementById("txtRafaga").value);
 
     var nProceso = new Proceso(id,nombre,tiempo,rafaga);
-    todasListas.dotarBase();
+    nProceso.procesoBase = procesoEspacioBase;
+    procesoEspacioBase++;
     addToTableShort("processList", nProceso);
 }
 
@@ -296,6 +298,7 @@ function modificarProcesoEjecucion() {
     var nProceso = new Proceso(id,nombre,tiempo,rafaga);
     nProceso.salidaDispatch = procesoEnEjecucion.salidaDispatch + 1;
     nProceso.tiempoInicio = procesoEnEjecucion.tiempoInicio;
+    nProceso.tiempoEspera = procesoEnEjecucion.tiempoEspera;
 
     procesoEnEjecucion.tiempoFinal = tiempoGlobalEjecucion;
     nProceso.procesoBase = procesoEnEjecucion.procesoBase;
@@ -351,7 +354,7 @@ function lineasTiempo(ctx) {
 
     var posicionTexto = 20;
 
-    if (procesos > 11 && dispatch == false) {
+    if (procesos >= 11 && dispatch == false) {
         myCanvas.height = 60+(procesos*20);
         dispatch = true;
     }
@@ -386,12 +389,20 @@ function imprimirProcesoEjecucion() {
 
 function printProceso(ctx, x, y, estado) {
     var tempColor = "";
-    if (y%2 == 1) {
-        tempColor = colorVerde2;
+    if (estado == true) {
+        if (y%2 == 1) {
+            tempColor = colorVerde2;
+        } else {
+            tempColor = colorVerde1;
+        }
     } else {
-        tempColor = colorVerde1;
+        if (y%2 == 1) {
+            tempColor = colorAmarillo2;
+        } else {
+            tempColor = colorAmarillo1;
+        }
     }
-    dibujarBarra(ctx, inicioBarras, (margenProceso + 10)+(y*distanciaEntreProcesos), (x*distanciaEntreBarras), anchoBarra, tempColor);
+    dibujarBarra(ctx, inicioBarras+(x*distanciaEntreBarras), (margenProceso + 10)+(y*distanciaEntreProcesos), distanciaEntreBarras, anchoBarra, tempColor);
 }
 
 var Posicion = function(_x, _y, _estado) {
@@ -399,24 +410,24 @@ var Posicion = function(_x, _y, _estado) {
     this.y = _y;
     this.estado = _estado;
 
-    this.dibujarPosicion(ctx) = function() {
+    this.dibujarPosicion = function(ctx) {
         printProceso(ctx, this.x, this.y, this.estado);
     };
 }
 
 function pintarProcesos(ctx) {
-    var temp = 0;
-
-    while (temp < procesos) {
-        printProceso(ctx,tiempoGlobalEjecucion,temp,"est");
-        temp++;
-    }
+    arregloPintarProcesos.forEach(function (elem) {
+        elem.dibujarPosicion(ctx);
+    });
 }
 
 function incrementarWait() {
     todasListas.listaLlegados.forEach(function(elem) {
         elem.tiempoRetorno += 1;
         elem.tiempoEspera += 1;
+
+        var nPosicion = new Posicion(tiempoGlobalEjecucion, elem.procesoBase, false);
+        arregloPintarProcesos.push(nPosicion);
     });
 }
 
@@ -425,6 +436,9 @@ function aumentarProcesoEjecucion() {
         procesoEnEjecucion.tiempoFinal += 1;
         procesoEnEjecucion.tiempoRetorno += 1;
         procesoEnEjecucion.rafaga -= 1;
+
+        var nPosicion = new Posicion(tiempoGlobalEjecucion, procesoEnEjecucion.procesoBase, true);
+        arregloPintarProcesos.push(nPosicion);
     }
 }
 
