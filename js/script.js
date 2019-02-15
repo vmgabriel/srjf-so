@@ -85,6 +85,7 @@ var listas = function() {
         var rafagaMin = 1000;
         this.listaLlegados.forEach(function (elem, index) {
             if(elem.rafaga < rafagaMin) {
+                console.log(`Seleccione ${elem.nombre}`);
                 rafagaMin = elem.rafaga;
                 proceso = index;
             }
@@ -119,15 +120,13 @@ var listas = function() {
     };
 
     this.rafagaProceso = function(proceso) {
-        var rafaga = 0;
-        console.log(this.listaProcesos);
+        var vRafaga = 0;
         this.listaProcesos.forEach(function(elem) {
-            console.log(`${elem.id} en esquema ${proceso.id}`);
             if (elem.id == proceso.id) {
-                rafaga = elem.rafaga;
+                vRafaga = elem.rafaga;
             }
         });
-        return rafaga;
+        return vRafaga;
     };
 
     this.modificarRafaga = function(proceso, rafaga) {
@@ -146,6 +145,7 @@ var Proceso = function(_id, _nombre, _tiempo, _rafaga) {
     this.nombre = _nombre;
     this.tiempoInicio = _tiempo;
     this.rafaga = _rafaga;
+    this.rafaga_inicio = _rafaga;
     this.tiempoComienzo = 0;
     this.tiempoFinal = 0;
     this.tiempoRetorno = 0;
@@ -160,7 +160,7 @@ var Proceso = function(_id, _nombre, _tiempo, _rafaga) {
               <td>${this.id}</td>
               <td>${this.nombre}</td>
               <td>${this.tiempoInicio}</td>
-              <td>${this.rafaga}</td>
+              <td>${this.rafaga_inicio}</td>
               <td>${this.tiempoComienzo}</td>
               <td>${this.tiempoFinal}</td>
               <td>${this.tiempoRetorno}</td>
@@ -302,7 +302,6 @@ function modificarProcesoEjecucion() {
 
     todasListas.addListaLlegados(nProceso);
 
-    procesoEnEjecucion.rafaga = todasListas.rafagaProceso(procesoEnEjecucion);
     addToTableLong("processListEnd", procesoEnEjecucion);
 }
 
@@ -422,13 +421,15 @@ function incrementarWait() {
 }
 
 function aumentarProcesoEjecucion() {
-    procesoEnEjecucion.tiempoFinal += 1;
-    procesoEnEjecucion.tiempoRetorno += 1;
-    procesoEnEjecucion.rafaga -= 1;
+    if  (procesoEnEjecucion != null) {
+        procesoEnEjecucion.tiempoFinal += 1;
+        procesoEnEjecucion.tiempoRetorno += 1;
+        procesoEnEjecucion.rafaga -= 1;
+    }
 }
 
 function prepararCiclo() {
-    if (todasListas.cantListaProcesosEspera() > 0) {
+    if (todasListas.cantListaProcesosEspera() > 0 || procesoEnEjecucion != null) {
         if (dispatchEstado == true) {
             if (procesoEnEjecucion == null) {
                 procesoEnEjecucion = todasListas.minProcesoRafaga();
@@ -443,13 +444,16 @@ function prepararCiclo() {
             dispatchEstado = false;
         }
         if (procesoEnEjecucion.rafaga == 0) {
-            procesoEnEjecucion.rafaga = todasListas.rafagaProceso(procesoEnEjecucion);
-            console.log(todasListas.rafagaProceso(procesoEnEjecucion));
             procesoEnEjecucion.tiempoFinal = tiempoGlobalEjecucion;
             addToTableLong("processListEnd", procesoEnEjecucion);
 
-            procesoEnEjecucion = todasListas.minProcesoRafaga();
-            procesoEnEjecucion.tiempoComienzo = tiempoGlobalEjecucion;
+            if (todasListas.cantListaProcesosEspera() > 0){
+                procesoEnEjecucion = todasListas.minProcesoRafaga();
+                procesoEnEjecucion.tiempoComienzo = tiempoGlobalEjecucion;
+            } else {
+                procesoEnEjecucion = null;
+            }
+
         }
         aumentarProcesoEjecucion();
         incrementarWait();
